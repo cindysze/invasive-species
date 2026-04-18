@@ -9,6 +9,35 @@
 
   <style>
 
+    .scan-container {
+    position: relative;
+    width: 300px;
+    margin: auto;
+    }
+
+    .scan-container img {
+    width: 100%;
+    border-radius: 12px;
+    }
+
+    /* 🌿 green scanning line */
+    .scan-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+
+    background: #8FFFBE;
+    box-shadow: 0 0 10px #8FFFBE;
+
+    animation: scan 2s linear infinite;
+    }
+
+    /* animation: top → bottom → repeat */
+    @keyframes scan {
+    0% { top: 0%; }
+    100% { top: 100%; }
+    }
 
     .navbar {
     position: fixed;
@@ -42,6 +71,20 @@
     display: inline-block;
     margin-left: 5px;
     animation: blink 1s infinite;
+    }
+
+    .loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top: 4px solid #8FFFBE;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    }
+
+    @keyframes spin {
+    100% { transform: rotate(360deg); }
     }
 
     @keyframes blink {
@@ -197,26 +240,46 @@
   <p>This project helps identify invasive species.</p>
 </div>
 
+<div id="loading" class="page" style="display:none;">
+  <div class="scan-container">
+    <img id="scan-image" />
+    <div class="scan-line"></div>
+  </div>
+  <p>Analyzing plant...</p>
+</div>
+
+<div id="resultPage" class="page" style="display:none;">
+  <h1>Result</h1>
+  <div id="final-result"></div>
+</div>
+
   <script>
 
     function showPage(pageId) {
     document.querySelectorAll(".page").forEach(p => p.style.display = "none");
     document.getElementById(pageId).style.display = "block";
     }
-    function handleUpload(event) {
-      const file = event.target.files[0];
+function handleUpload(event) {
+  const file = event.target.files[0];
+  const imageURL = URL.createObjectURL(file);
 
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.className = "preview";
+  // show loading page
+  showPage("loading");
 
-      const preview = document.getElementById("preview");
-      preview.innerHTML = "";
-      preview.appendChild(img);
+  // set image inside scanner
+  document.getElementById("scan-image").src = imageURL;
 
-      document.getElementById("result").innerText =
-        "🌱 Tree of Heaven (Invasive)";
-    }
+  // simulate processing
+  setTimeout(() => {
+    showPage("resultPage");
+
+    document.getElementById("final-result").innerHTML = `
+      <p>🌱 <strong>Tree of Heaven</strong></p>
+      <p>Status: Invasive</p>
+      <p>Action: Remove if possible</p>
+    `;
+  }, 2500);
+}
 
     
 
