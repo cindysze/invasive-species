@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Weed Out!</title>
+ 
+  <style>
+ 
+    /* ========================= RESET & BASE ========================= */
+    *, *::before, *::after { box-sizing: border-box; }
+ 
+    body {
+      margin: 0;
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      background: url("imgs/test_background.png") center/cover no-repeat;
+      animation: bgMove 20s ease-in-out infinite alternate;
+    }
+ 
+    @keyframes bgMove {
+      0%   { background-position: center; }
+      100% { background-position: center top; }
+    }
+ 
+    /* ========================= OVERLAY ========================= */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.42);
+      z-index: 1;
+    }
+ 
+    /* ========================= NAVBAR ========================= */
+    .navbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 8px 24px;
+      border-radius: 999px;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      display: flex;
+      gap: 24px;
+      z-index: 10;
+    }
+ 
+    .navbar span {
+      cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+ 
+    .navbar span:hover { color: #a8e6b0; }
+ 
+    /* ========================= PAGES ========================= */
+    .page {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+ 
+    /* ========================= UPLOAD PAGE ========================= */
+    #upload h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 72px;
+    letter-spacing: 3px;
+    margin: 0 0 6px;
+    line-height: 1;
+    color: #f5f2ec;
+    animation: glowPulse 4s ease-in-out infinite;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+    }
+
+    #upload {
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 28px;
+    padding: 2.5rem 3rem;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    }
+    
+    #upload h1 em {
+      font-style: italic;
+      color: #a8e6b0;
+    }
+ 
+    #upload > p {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin: 0 0 2rem;
+    font-weight: 300;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+    }
+ 
+    @keyframes glowPulse {
+      0%, 100% { text-shadow: 0 0 12px rgba(168,230,176,0.15); }
+      50%       { text-shadow: 0 0 30px rgba(168,230,176,0.45); }
+    }
+ 
+    /* ========================= UPLOAD BOX ========================= */
+    .upload-box {
+    position: relative;
+    overflow: hidden;
+    border: 1.5px dashed rgba(168,230,176,0.7);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    width: 300px;
+    margin: auto;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    background: rgba(10,20,10,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    }
+ 
+    .upload-box:hover {
+      border-color: rgba(168,230,176,0.7);
+      background: rgba(168,230,176,0.09);
+    }
+ 
+    .upload-box svg {
+      display: block;
+      margin: 0 auto 12px;
+      opacity: 0.45;
+    }
+ 
+    .upload-box p {
+      margin: 0;
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+    }
+ 
+    .upload-box .hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 6px;
+    }
+ 
+    .upload-box::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(168,230,176,0.25), transparent);
+      transform: translateX(-100%);
+    }
+ 
+    .upload-box:hover::after {
+      animation: shine 0.8s forwards;
+    }
+ 
+    @keyframes shine {
+      to { transform: translateX(100%); }
+    }
+ 
+    /* ========================= CURSOR ========================= */
+    .cursor {
+      display: inline-block;
+      margin-left: 3px;
+      animation: blink 1s infinite;
+      color: #a8e6b0;
+      font-weight: 300;
+    }
+ 
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75%       { opacity: 0; }
+    }
+ 
+    /* ========================= PREVIEW IMAGE ========================= */
+    img.preview {
+      margin-top: 20px;
+      max-width: 200px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+ 
+    /* ========================= LOADING PAGE ========================= */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+ 
+    .scan-container {
+      position: relative;
+      width: 280px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+ 
+    .scan-container img {
+      width: 100%;
+      display: block;
+      border-radius: 14px;
+    }
+ 
+    .scan-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #a8e6b0;
+      box-shadow: 0 0 12px #a8e6b0, 0 0 30px rgba(168,230,176,0.4);
+      animation: scan 2s linear infinite;
+    }
+ 
+    @keyframes scan {
+      0%   { top: 0%; }
+      100% { top: 100%; }
+    }
+ 
+    #loading p {
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin: 0;
+    }
+ 
+    /* ========================= RESULT PAGE ========================= */
+    #resultPage {
+      animation: fadeUp 0.6s ease-out;
+    }
+ 
+    #resultPage h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 48px;
+      letter-spacing: 2px;
+      color: #f5f2ec;
+      margin: 0 0 1.5rem;
+    }
+ 
+    .result-card {
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 0.5px solid rgba(168,230,176,0.2);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 300px;
+      margin: auto;
+      text-align: left;
+    }
+ 
+    .result-card .label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin: 0 0 4px;
+    }
+ 
+    .result-card .plant-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 300;
+      font-style: italic;
+      color: #f5f2ec;
+      margin: 0 0 1.25rem;
+    }
+ 
+    .result-card .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 0.5px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+    }
+ 
+    .result-card .row .key {
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.04em;
+    }
+ 
+    .result-card .row .val {
+      font-weight: 500;
+      color: #f5f2ec;
+    }
+ 
+    .badge-invasive {
+      background: rgba(230,80,60,0.2);
+      border: 0.5px solid rgba(230,80,60,0.4);
+      color: #f4a49a;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+ 
+    .btn-again {
+      margin-top: 1.5rem;
+      display: inline-block;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      border: 0.5px solid rgba(255,255,255,0.15);
+      padding: 8px 20px;
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+ 
+    .btn-again:hover {
+      color: #a8e6b0;
+      border-color: rgba(168,230,176,0.4);
+    }
+ 
+    /* ========================= ABOUT PAGE ========================= */
+    #about {
+      position: fixed;
+      inset: 0;
+      background: #f4f1ea;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+ 
+    #about h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 52px;
+      color: #1a2416;
+      letter-spacing: 2px;
+      margin: 0 0 1.5rem;
+    }
+ 
+    #about p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: #4a5545;
+      max-width: 480px;
+      text-align: center;
+      line-height: 1.8;
+      margin: 0 0 1rem;
+      font-weight: 300;
+    }
+ 
+    /* ========================= EXPLORE PAGE ========================= */
+    #explore h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 52px;
+      letter-spacing: 2px;
+      color: #f5f2ec;
+      margin: 0 0 0.5rem;
+    }
+ 
+    #explore p {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+ 
+    /* ========================= FADE ANIMATION ========================= */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    .card {
+      animation: fadeUp 0.8s ease-out;
+    }
+ 
+  </style>
+</head>
+ 
+<body>
+ 
+  <nav class="navbar">
+    <span onclick="showPage('upload')">Upload</span>
+    <span onclick="showPage('explore')">Explore</span>
+    <span onclick="showPage('about')">About</span>
+  </nav>
+ 
+  <div class="overlay"></div>
+ 
+  <!-- ========================= UPLOAD PAGE ========================= -->
+  <div id="upload" class="page card">
+    <h1>weed <em><span id="typed-text"></span></em><span id="cursor" class="cursor">|</span></h1>
+    <p>invasive species identification</p>
+ 
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 4C18 4 10 12 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 12 18 4 18 4Z" stroke="#a8e6b0" stroke-width="1.5"/>
+        <path d="M18 14V28M14 18C16 16 18 18 20 16C22 18 22 18 22 18" stroke="#a8e6b0" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M12 33H24" stroke="#a8e6b0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>Drop a photo of your plant</p>
+      <p class="hint">jpg · png · heic — up to 10 MB</p>
+    </div>
+ 
+    <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="handleUpload(event)" />
+ 
+    <div id="preview"></div>
+  </div>
+ 
+  <!-- ========================= LOADING PAGE ========================= -->
+  <div id="loading" class="page" style="display:none;">
+    <div class="scan-container">
+      <img id="scan-image" alt="Scanning plant" />
+      <div class="scan-line"></div>
+    </div>
+    <p>Analyzing plant&hellip;</p>
+  </div>
+ 
+  <!-- ========================= RESULT PAGE ========================= -->
+  <div id="resultPage" class="page" style="display:none;">
+    <h1>Identified</h1>
+    <div class="result-card">
+      <p class="label">Species</p>
+      <p class="plant-name">Tree of Heaven</p>
+      <div class="row">
+        <span class="key">Status</span>
+        <span class="badge-invasive">Invasive</span>
+      </div>
+      <div class="row">
+        <span class="key">Action</span>
+        <span class="val">Remove if possible</span>
+      </div>
+      <div class="row">
+        <span class="key">Origin</span>
+        <span class="val">China</span>
+      </div>
+    </div>
+    <div class="btn-again" onclick="showPage('upload')">↑ Scan another</div>
+  </div>
+ 
+  <!-- ========================= EXPLORE PAGE ========================= -->
+  <div id="explore" class="page" style="display:none;">
+    <h1>Explore</h1>
+    <p>Coming soon</p>
+  </div>
+ 
+  <!-- ========================= ABOUT PAGE ========================= -->
+  <div id="about" style="display:none;">
+    <h1>Weed Out</h1>
+    <p>
+      An AI-powered tool designed to help identify invasive plant species
+      and guide users toward meaningful environmental action.
+    </p>
+    <p>
+      By combining computer vision with ecological data, we make
+      environmental awareness accessible, actionable, and engaging.
+    </p>
+    <div class="btn-again" onclick="showPage('upload')" style="color:#4a5545; border-color:rgba(74,85,69,0.3); margin-top:2rem;">
+      ← Back
+    </div>
+  </div>
+ 
+  <script>
+ 
+    /* ========================= PAGE ROUTING ========================= */
+    function showPage(pageId) {
+      const pages = ['upload', 'loading', 'resultPage', 'explore', 'about'];
+      pages.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      document.getElementById(pageId).style.display =
+        pageId === 'about' ? 'flex' : 'block';
+    }
+ 
+    /* ========================= FILE UPLOAD ========================= */
+    function handleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const imageURL = URL.createObjectURL(file);
+ 
+      showPage('loading');
+      document.getElementById('scan-image').src = imageURL;
+ 
+      setTimeout(() => {
+        showPage('resultPage');
+      }, 2800);
+    }
+ 
+    /* drag-and-drop support */
+    const uploadBox = document.querySelector('.upload-box');
+ 
+    uploadBox.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadBox.style.borderColor = 'rgba(168,230,176,0.8)';
+    });
+ 
+    uploadBox.addEventListener('dragleave', () => {
+      uploadBox.style.borderColor = '';
+    });
+ 
+    uploadBox.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadBox.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        handleUpload({ target: { files: [file] } });
+      }
+    });
+ 
+    /* ========================= TYPEWRITER ========================= */
+    const text = "out!";
+    let index = 0;
+ 
+    function typeEffect() {
+      if (index < text.length) {
+        document.getElementById("typed-text").textContent += text.charAt(index);
+        index++;
+        setTimeout(typeEffect, 90);
+      } else {
+        document.getElementById("cursor").style.display = "none";
+      }
+    }
+ 
+    window.addEventListener("load", () => {
+      setTimeout(typeEffect, 800);
+    });
+ 
+  </script>
+ 
+</body>
+</html>
