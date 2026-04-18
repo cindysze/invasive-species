@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Weed Out!</title>
+
+  
+
+  <style>
+
+
+    .navbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    
+    padding: 10px 20px;
+    border-radius: 999px;
+    
+    display: flex;
+    gap: 20px;
+    z-index: 3;
+    }
+
+    .navbar span {
+    cursor: pointer;
+    color: white;
+    opacity: 0.7;
+    transition: 0.2s;
+    }
+
+    .navbar span:hover {
+    opacity: 1;
+    }
+
+    .cursor {
+    display: inline-block;
+    margin-left: 5px;
+    animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+    }
+    /* =========================
+       🌿 FULL GRID BACKGROUND
+       ========================= */
+    .grid {
+      position: fixed;
+      inset: 0;
+
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* fewer columns */
+      grid-auto-rows: 1fr; /* fills screen evenly */
+
+      height: 100vh;
+      width: 100vw;
+
+      z-index: 0;
+    }
+
+    .grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* =========================
+       🌑 LIGHT OVERLAY (NOT TOO DARK)
+       ========================= */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35); /* lighter */
+      z-index: 1;
+    }
+
+    /* =========================
+       🌿 MAIN UI
+       ========================= */
+    body {
+
+
+    /* MAY DELETE */
+
+    /* MAY DELETE */
+
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    /* 🌿 YOUR IMAGE BACKGROUND */
+    background: url("imgs/test_background.png");
+    background-size: cover;
+    background-position: center;
+}
+
+    .card {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    h1 {
+
+
+
+      font-size: 70px;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    
+    p {
+      color: #eee;
+      margin-bottom: 30px;
+    }
+
+    .upload-box {
+      border: 2px dashed rgba(255,255,255,0.6);
+      border-radius: 20px;
+      padding: 25px;
+      width: 320px;
+      margin: auto;
+      cursor: pointer;
+      transition: 0.2s;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .upload-box:hover {
+      border-color: #00e676;
+      background: rgba(0,255,150,0.15);
+    }
+
+    img.preview {
+      margin-top: 20px;
+      max-width: 200px;
+      border-radius: 10px;
+    }
+
+    .result {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+      <div class="navbar">
+    <span onclick="showPage('upload')">Upload</span>
+    <span onclick="showPage('explore')">Explore</span>
+    <span onclick="showPage('about')">About</span>
+    </div>
+
+  <!-- 🌿 BACKGROUND GRID -->
+
+  <!-- 🌑 LIGHT OVERLAY -->
+  <div class="overlay"></div>
+
+  <!-- 🌿 MAIN UI -->
+  <div id="upload" class="page card">
+    <h1 class="text-7xl font-light tracking-wide font-sans text-white">
+    weed <span id="typed-text"></span>
+    <span id="cursor" class="text-accent-success animate-pulse">|</span>
+    </h1>
+    <p>ai-powered invasive species detection</p>
+
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+      Drag & drop or click to upload
+    </div>
+
+    <input type="file" id="fileInput" style="display:none" onchange="handleUpload(event)" />
+
+    <div id="preview"></div>
+    <div id="result" class="result"></div>
+  </div>
+
+  <div id="explore" class="page" style="display:none;">
+  <h1>Explore</h1>
+  <p>Coming soon...</p>
+</div>
+
+<div id="about" class="page" style="display:none;">
+  <h1>About</h1>
+  <p>This project helps identify invasive species.</p>
+</div>
+
+  <script>
+
+    function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    document.getElementById(pageId).style.display = "block";
+    }
+    function handleUpload(event) {
+      const file = event.target.files[0];
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.className = "preview";
+
+      const preview = document.getElementById("preview");
+      preview.innerHTML = "";
+      preview.appendChild(img);
+
+      document.getElementById("result").innerText =
+        "🌱 Tree of Heaven (Invasive)";
+    }
+
+    
+
+    const text = "out!";
+    let index = 0;
+
+    function typeEffect() {
+    if (index < text.length) {
+        document.getElementById("typed-text").innerHTML += text.charAt(index);
+        index++;
+        setTimeout(typeEffect, 80);
+    } else {
+        // 👇 remove cursor when done
+        document.getElementById("cursor").style.display = "none";
+    }
+    }
+
+    window.addEventListener("load", () => {
+    setTimeout(typeEffect, 1500); // after loader
+    });
+  </script>
+
+</body>
+</html>

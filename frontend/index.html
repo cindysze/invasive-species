@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weed Out!</title>
+    <style>
+        #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    }
+
+    /* floating shape */
+    .cube {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #aaa, #444);
+    transform-style: preserve-3d;
+    animation: float 2s ease-in-out infinite;
+    }
+
+/* animation */
+@keyframes float {
+  0% {
+    transform: rotateX(20deg) rotateY(0deg) translateY(0px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotateX(20deg) rotateY(180deg) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(20deg) rotateY(360deg) translateY(0px);
+    opacity: 0.6;
+  }
+}
+
+    body {
+        
+
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #f5f5f5);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .upload-box {
+      border: 2px dashed #bbb;
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .upload-box:hover {
+      border-color: #4caf50;
+      background: #f1f8f4;
+    }
+
+    img {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f1f8f4;
+      font-weight: bold;
+    }
+
+    .loading {
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+
+    <div id="loader">
+    <div class="cube"></div>
+    </div>
+
+  <div class="card">
+    <h1>🌿 Weed Out!</h1>
+    <p>Upload a photo to identify invasive species</p>
+
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+      Click or drag an image here
+    </div>
+
+    <input type="file" id="fileInput" style="display:none" onchange="handleUpload(event)" />
+
+    <div id="preview"></div>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    function handleUpload(event) {
+      const file = event.target.files[0];
+
+      // show preview
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+
+      const preview = document.getElementById("preview");
+      preview.innerHTML = "";
+      preview.appendChild(img);
+
+      const result = document.getElementById("result");
+      result.style.display = "block";
+      result.classList.add("loading");
+      result.innerText = "Analyzing...";
+
+      // fake prediction (replace later)
+      setTimeout(() => {
+        result.classList.remove("loading");
+        result.innerText = "🌱 Tree of Heaven (Invasive)\n\nRemove if possible and report locally.";
+      }, 1200);
+    }
+  </script>
+
+  <script>
+window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+
+  setTimeout(() => {
+    loader.style.opacity = "0";
+    loader.style.transition = "opacity 0.5s ease";
+
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 500);
+  }, 1500); // controls how long it shows
+});
+</script>
+
+</body>
+</html>
