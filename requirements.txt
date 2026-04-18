@@ -1,0 +1,14 @@
+torch>=2.1.0
+torchvision>=0.16.0
+Pillow>=10.0.0
+gradio>=4.44.0
+# Gradio 4.x expects huggingface_hub 0.x (HfFolder); 1.x breaks imports in gradio.oauth
+huggingface_hub>=0.23.0,<1.0
+# Pydantic 2.11+ JSON schemas use additionalProperties: true (bool); gradio_client 1.x on Gradio 4.44
+# mishandles that (TypeError in json_schema_to_python_type). Stay on 2.10.x until Gradio is upgraded.
+pydantic>=2.0,<2.11
+requests>=2.31.0
+tqdm>=4.66.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.9

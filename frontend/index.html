@@ -96,12 +96,23 @@
       padding: 15px;
       border-radius: 10px;
       background: #f1f8f4;
-      font-weight: bold;
+      text-align: left;
+      font-weight: normal;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 420px;
+      overflow-y: auto;
     }
 
     .loading {
       color: #999;
       font-style: italic;
+    }
+
+    .err {
+      background: #ffebee;
+      color: #c62828;
     }
   </style>
 </head>
@@ -127,10 +138,14 @@
   </div>
 
   <script>
-    function handleUpload(event) {
-      const file = event.target.files[0];
+    // Same origin: open index.html via a static server (e.g. python -m http.server in frontend/)
+    // and set API base to your FastAPI URL.
+    const API_BASE = window.INAT_API_BASE || "http://127.0.0.1:8000";
 
-      // show preview
+    async function handleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
       const img = document.createElement("img");
       img.src = URL.createObjectURL(file);
 
@@ -140,14 +155,51 @@
 
       const result = document.getElementById("result");
       result.style.display = "block";
+      result.classList.remove("err");
       result.classList.add("loading");
-      result.innerText = "Analyzing...";
+      result.innerText = "Analyzing…";
 
-      // fake prediction (replace later)
-      setTimeout(() => {
+      const fd = new FormData();
+      fd.append("file", file, file.name);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/identify`, {
+          method: "POST",
+          body: fd,
+        });
+        const data = await res.json();
         result.classList.remove("loading");
-        result.innerText = "🌱 Tree of Heaven (Invasive)\n\nRemove if possible and report locally.";
-      }, 1200);
+
+        if (!data.ok) {
+          result.classList.add("err");
+          result.innerText = data.error || "Request failed.";
+          return;
+        }
+
+        // Same markdown string as Gradio (includes invasive notes + footers).
+        if (data.markdown) {
+          result.innerText = data.markdown;
+          return;
+        }
+
+        let text = "";
+        (data.suggestions || []).forEach((s, i) => {
+          const name = s.common_name || s.scientific_name || "Unknown";
+          const sci = s.scientific_name || "";
+          text += `${i + 1}. ${name} (${sci})\n`;
+          text += "   " + (s.invasive_summary || "") + "\n\n";
+        });
+        if (data.llm_summary) text += "\n---\n" + data.llm_summary;
+        result.innerText = text.trim() || JSON.stringify(data, null, 2);
+      } catch (e) {
+        result.classList.remove("loading");
+        result.classList.add("err");
+        result.innerText =
+          "Could not reach API at " +
+          API_BASE +
+          ". Start the backend: uvicorn backend.main:app --reload\n" +
+          String(e);
+      }
     }
   </script>
 
