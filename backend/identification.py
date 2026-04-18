@@ -28,21 +28,21 @@ def format_predictions_markdown(rows: list[dict], *, backend: str = "local") -> 
     if rows:
         reg = rows[0].get("study_region") or ""
         if reg:
-            lines.append(f"**Scope:** {reg}")
+            lines.append(f"Scope: {reg}")
             lines.append("")
         src = rows[0].get("source")
         if src and backend == "inaturalist":
-            lines.append(f"**ID source:** {src}")
+            lines.append(f"ID source: {src}")
             lines.append("")
     for i, r in enumerate(rows, 1):
         name = r.get("common_name") or r.get("scientific_name") or "Unknown"
         sci = r.get("scientific_name", "")
         if backend == "inaturalist":
             raw = r.get("raw_score", r.get("confidence", 0))
-            lines.append(f"**{i}. {name}** ({sci}) — iNaturalist score **{float(raw):.4f}**")
+            lines.append(f"{i}. {name} ({sci}) - iNaturalist score {float(raw):.4f}")
         else:
             pct = 100.0 * float(r["confidence"])
-            lines.append(f"**{i}. {name}** ({sci}) — {pct:.1f}% local model confidence")
+            lines.append(f"{i}. {name} ({sci}) - {pct:.1f}% local model confidence")
         lines.append(f"- Invasive note: {r.get('invasive_summary', '')}")
         lines.append(f"- {r.get('invasive_detail', '')}")
         lines.append("")
@@ -95,17 +95,17 @@ def identify_from_pil(image) -> IdentifyOutcome:
 
         text = format_predictions_markdown(top, backend="inaturalist")
         if summary:
-            text += "\n\n---\n### Optional LLM summary (OpenAI)\n\n" + summary
+            text += "\n\n---\nOptional LLM summary (OpenAI)\n\n" + summary
         best = top[0] if top else {}
         raw = float(best.get("raw_score", best.get("confidence", 0)))
         caveat = (
-            f"\n\n---\n*Suggestions from **iNaturalist Computer Vision**. "
+            f"\n\n---\nSuggestions from iNaturalist Computer Vision. "
             f"Geo hint: near {REGION_SHORT} (override with INAT_LAT / INAT_LNG). "
-            "Scores are API outputs, not probabilities.*"
+            "Scores are API outputs, not probabilities."
         )
         if raw < 0.08 and top:
             caveat = (
-                "\n\n---\n**Low top score.** Try a sharper photo or adjust location hints." + caveat
+                "\n\n---\nLow top score. Try a sharper photo or adjust location hints." + caveat
             )
         text += caveat
         return IdentifyOutcome(
@@ -124,12 +124,12 @@ def identify_from_pil(image) -> IdentifyOutcome:
     top = clf.predict_topk(image, k=5)
     best = top[0]
     caveat = (
-        f"\n\n---\n*Local model trained on iNaturalist export for {REGION_SHORT}; "
-        "only knows species with enough training images.*"
+        f"\n\n---\nLocal model trained on iNaturalist export for {REGION_SHORT}; "
+        "only knows species with enough training images."
     )
     if float(best["confidence"]) < 0.35:
         caveat = (
-            "\n\n---\n**Low confidence.** Try a clearer photo of leaves/flowers." + caveat
+            "\n\n---\nLow confidence. Try a clearer photo of leaves/flowers." + caveat
         )
     text = format_predictions_markdown(top, backend="local") + caveat
     return IdentifyOutcome(ok=True, backend="local", suggestions=top, markdown=text)
